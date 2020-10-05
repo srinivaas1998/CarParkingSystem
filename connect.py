@@ -1,130 +1,65 @@
-import psycopg2
+from tkinter import *
 from ocr_final import ocr
-
-from datetime import datetime
-now = datetime.now()
-
-
-def insert_entry(id,car_no,entry_time):
-    """ insert a new vendor into the vendors table """
-    sql = """INSERT INTO entry(id,car_no,entry_time)
-             VALUES(%s,%s,%s) ;"""
-    conn = None
-    try:
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect("dbname=Car user=postgres password=chinku")
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the INSERT statement
-        cur.execute(sql, (id,car_no,entry_time))
-
-        # commit the changes to the database
-        conn.commit()
-        # close communication with the database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
+from connect import db_add
+root = Tk()
+root.title("Car Parking")
+frame = LabelFrame(root, text="Welcome to car parking lot",padx=50,pady=50)
+frame.pack(padx=50,pady=50)
 
 
-def update_park(id,car_no):
-    """ update vendor name based on the vendor id """
-    sql = """ UPDATE park
-                SET car_no = %s
-                WHERE id = %s"""
+def park():
+    top = Toplevel();
+    frame_inner = LabelFrame(top, text="Welcome to Parking", padx=50, pady=50)
+    frame_inner.pack(padx=50, pady=50)
 
-    conn = None
-    updated_rows = 0
-    try:
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect("dbname=Car user=postgres password=chinku")
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the UPDATE  statement
-        cur.execute(sql, (car_no, id))
-        # get the number of updated rows
-        updated_rows = cur.rowcount
-        # Commit the changes to the database
-        conn.commit()
-        # Close communication with the PostgreSQL database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-
-    return updated_rows
+    e = Entry(frame_inner, width=35, borderwidth=5)
+    e.pack(padx=5, pady=10)
 
 
-def update_alloted():
-    """ update vendor name based on the vendor id """
-    sql = """ UPDATE park
-                SET alloted = TRUE
-                WHERE car_no is not null"""
+    def enter():
+        top1 = Toplevel();
+        frame_inner1 = LabelFrame(top1, text="", padx=50, pady=50)
+        frame_inner1.pack(padx=50, pady=50)
+        innerLabel=Label(frame_inner1, text="You parking spot is")
+        innerLabel.pack()
+        a = ocr(e.get())
+        print(a)
+        myLabel1 = Label(frame_inner1, text=db_add(ocr(e.get())))
+        myLabel1.pack()
 
-    conn = None
-    updated_rows = 0
-    try:
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect("dbname=Car user=postgres password=chinku")
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the UPDATE  statement
-        cur.execute(sql)
-        # get the number of updated rows
-        updated_rows = cur.rowcount
-        # Commit the changes to the database
-        conn.commit()
-        # Close communication with the PostgreSQL database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
+    button_enter = Button(frame_inner, text="Enter Car Number", padx=5, pady=10, command=enter)
+    button_enter.pack()
+    myLabel = Label(frame_inner, text=e.get())
+    myLabel.pack()
 
-    return updated_rows
+def leave():
+    top = Toplevel();
+    frame_inner = LabelFrame(top, text="Thank you for Parking", padx=50, pady=50)
+    frame_inner.pack(padx=50, pady=50)
 
+    e = Entry(frame_inner, width=35, borderwidth=5)
+    e.pack(padx=5, pady=10)
 
-def update_park1():
-    """ update vendor name based on the vendor id """
-    sql = """ UPDATE entry
-                SET  parking_alloted=p.parking 
-                FROM entry e,park p
-                WHERE (e.car_no = p.car_no) and (e.id = p.id) """
+    def enter():
+        top1 = Toplevel();
+        frame_inner1 = LabelFrame(top1, text="", padx=50, pady=50)
+        frame_inner1.pack(padx=50, pady=50)
+        innerLabel = Label(frame_inner1, text="Please pay a amount of ")
+        innerLabel.pack()
+        myLabel1 = Label(frame_inner1, text=e.get())
+        myLabel1.pack()
 
-    conn = None
-    updated_rows = 0
-    try:
-        # connect to the PostgreSQL database
-        conn = psycopg2.connect("dbname=Car user=postgres password=chinku")
-        # create a new cursor
-        cur = conn.cursor()
-        # execute the UPDATE  statement
-        cur.execute(sql)
-        # get the number of updated rows
-        updated_rows = cur.rowcount
-        # Commit the changes to the database
-        conn.commit()
-        # Close communication with the PostgreSQL database
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-
-    return updated_rows
+    button_enter = Button(frame_inner, text="Enter Car Number", padx=5, pady=10, command=enter)
+    button_enter.pack()
+    myLabel = Label(frame_inner, text=e.get())
+    myLabel.pack()
 
 
-if __name__ == '__main__':
-    insert_entry(2, ocr("000.png") ,now)
-    update_park(2, ocr("000.png"))
-    update_alloted()
-    update_park1()
+button1 = Button(frame, text="Park ", command=park)
+button2 = Button(frame, text="Leave", command=leave)
 
+button1.pack(padx=5, pady=10)
+button2.pack()
 
+root.mainloop()
 
