@@ -1,5 +1,6 @@
 from tkinter import *
 from ocr_final import ocr
+from connect import db_add
 root = Tk()
 root.title("Car Parking")
 frame = LabelFrame(root, text="Welcome to car parking lot",padx=50,pady=50)
@@ -11,9 +12,9 @@ def park():
     frame_inner = LabelFrame(top, text="Welcome to Parking", padx=50, pady=50)
     frame_inner.pack(padx=50, pady=50)
 
-
     e = Entry(frame_inner, width=35, borderwidth=5)
     e.pack(padx=5, pady=10)
+
 
     def enter():
         top1 = Toplevel();
@@ -21,7 +22,9 @@ def park():
         frame_inner1.pack(padx=50, pady=50)
         innerLabel=Label(frame_inner1, text="You parking spot is")
         innerLabel.pack()
-        myLabel1 = Label(frame_inner1, text=ocr(e.get()))
+        a = ocr(e.get())
+        print(a)
+        myLabel1 = Label(frame_inner1, text=db_add(ocr(e.get())))
         myLabel1.pack()
 
     button_enter = Button(frame_inner, text="Enter Car Number", padx=5, pady=10, command=enter)
